@@ -3,18 +3,31 @@ from pathlib import Path
 import re
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
-import json
+import os
 
-def create_file_directory(path_directory,phrase,ext):
-    #create directory according to month, day, and year, return the file name with the path + phrase + full hour + file extension.#
+def create_directory(path_directory,phrase):
+    #create directory
+    now = datetime.now()
+    date = now.strftime('%m-%d-%Y')
+    
+    path_directory_complete =os.path.join(path_directory,phrase+"-"+date)
+    artifacts_dir = os.path.join(os.getcwd(), path_directory_complete)
+    
+    if not os.path.exists(artifacts_dir):
+        os.makedirs(artifacts_dir)
+        
+    return artifacts_dir
+    
+def create_file(path_directory,phrase,ext):
+    #create file according to month, day, and year, return the file name with the path + phrase + full hour + file extension.#
     now = datetime.now()
     date = now.strftime('%m-%d-%Y')
     hours_and_minutes = now.strftime('%H%M%S-%f')
-    directory = path_directory+"\\"+phrase+"-"+date
-    file = directory+"\\"+phrase+date+hours_and_minutes+"."+ext
-    Path(directory).mkdir(parents=True, exist_ok=True)
     
-    return file
+    name_excel = phrase+date+hours_and_minutes+"."+ext
+    Excel = os.path.join(path_directory, name_excel)
+   
+    return Excel
 
 def contains_amount(title, description):
     # Patterns for the money amount formats#
@@ -47,12 +60,3 @@ def get_date(Number):
     formatted_date = date.strftime("%m/%d/%Y")
     formatted_today = today.strftime('%m/%d/%Y')
     return formatted_today,formatted_date
-
-def init_config(path):
-    with open(path, "r") as f:
-        config = json.load(f)
-    return config
-
-def convert_string_to_list(Category):
-    #Converts a comma-separated string of categories into a list.
-    return ["Any"] if not Category else Category.split(',')
